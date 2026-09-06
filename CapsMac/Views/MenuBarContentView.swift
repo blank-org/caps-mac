@@ -17,8 +17,12 @@ struct MenuBarContentView: View {
                 appState.toggleSuspended()
             }
 
-            Button("Settings…") {
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+            if #available(macOS 14.0, *) {
+                SettingsLink("Settings…")
+            } else {
+                Button("Settings…") {
+                    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                }
             }
 
             Button("About Caps") {
