@@ -2,7 +2,7 @@
 
 Native Swift/SwiftUI port of [Caps](../README.md) — a menu-bar keyboard utility that turns **Caps Lock** into a hold-modifier for home-row navigation, editing, media, and more.
 
-> **Status:** scaffold only. The app launches and shows a menu-bar shell; keyboard remapping is not implemented yet.
+> **Status:** menu-bar shell plus Caps Lock layer tracking. Accessibility status live-updates in Settings; a CGEvent tap owns Caps Lock / Right Command. Key remapping is not implemented yet.
 
 ## Requirements
 
@@ -30,7 +30,7 @@ macos/
 │   ├── App/               # AppDelegate, shared AppState
 │   ├── Views/             # Menu bar menu, Settings, About
 │   ├── Modules/
-│   │   ├── CapsInput/     # CGEvent tap / modifier state (stubs)
+│   │   ├── CapsInput/     # CGEvent tap / Caps Lock layer state
 │   │   ├── CapsKeyMap/    # Key → action map (stubs)
 │   │   ├── CapsConfig/    # Configuration persistence (stubs)
 │   │   └── CapsSystem/    # Accessibility, media, app launch (stubs)
@@ -42,14 +42,14 @@ macos/
 
 | Module | Responsibility |
 |--------|----------------|
-| **CapsInput** | Capture Caps Lock hold/double-tap; install global event tap |
+| **CapsInput** | CGEvent tap: Caps Lock hold / double-tap lock, Right Command alternate layer |
 | **CapsKeyMap** | Map physical keys to actions (parity with `resource/map_caps.csv`) |
 | **CapsConfig** | User settings (`~/Library/Application Support/Caps/config.json`) |
 | **CapsSystem** | Accessibility permission, volume/media, display sleep, app launchers |
 
 ## Accessibility permission
 
-Global key remapping requires **Accessibility** access. The Settings window includes a shortcut to System Settings → Privacy & Security → Accessibility. Grant access before testing future keyboard hooks.
+Global key remapping requires **Accessibility** access. Open **Settings** from the menu bar and use **Grant Accessibility Access**. After you enable Caps in System Settings → Privacy & Security → Accessibility, the Settings window updates to **Granted** and starts the keyboard hook automatically (no restart in typical cases). If the hook still says **Not running**, quit and reopen Caps.
 
 ## Command-line build (optional)
 
@@ -73,7 +73,6 @@ The shipping Windows build lives at the repo root (`caps.ahk` → `caps.exe`). S
 
 ## Next steps
 
-1. Wire `CapsInputHandler` to a `CGEvent` tap for Caps Lock.
-2. Expand `KeyMap` toward Windows parity using `resource/map_caps.csv`.
-3. Implement `SystemIntegration` actions (volume, Terminal, VS Code, dark mode).
-4. Add Input Monitoring entitlement if required for certain key paths.
+1. Expand `KeyMap` toward Windows parity using `resource/map_caps.csv` (WASD / IJKL arrows first).
+2. Implement `SystemIntegration` actions (volume, Terminal, VS Code, dark mode).
+3. Add Input Monitoring entitlement if required for certain key paths.

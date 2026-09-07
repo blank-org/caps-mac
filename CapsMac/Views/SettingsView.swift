@@ -8,34 +8,59 @@ struct SettingsView: View {
         Form {
             Section("Layer") {
                 LabeledContent("Status") {
-                    Text(appState.isSuspended ? "Suspended" : "Active")
+                    Text(appState.isSuspended ? "Suspended" : appState.modifierState.layerDescription)
                 }
             }
 
             Section("Configuration") {
                 Toggle("Map right click to left click", isOn: $configuration.rightClickMapsToLeftClick)
-                    .help("Mirrors the Windows `right_click_left` option in config.ini.")
+                    .help(Text(verbatim: "Mirrors the Windows right_click_left option in config.ini."))
             }
 
             Section("Permissions") {
                 LabeledContent("Accessibility") {
-                    Text(AccessibilityPermission.statusDescription)
+                    Text(appState.accessibilityStatusDescription)
+                        .foregroundStyle(appState.isAccessibilityGranted ? Color.green : Color.orange)
                 }
-                Button("Open Accessibility Settings") {
-                    AccessibilityPermission.requestAccess()
+                LabeledContent("Keyboard hook") {
+                    Text(keyboardHookDescription)
+                        .foregroundStyle(appState.isEventTapRunning ? Color.green : Color.secondary)
+                }
+                if !appState.isAccessibilityGranted {
+                    Text("Grant access in System Settings, then return here. Status updates automatically — no restart required once macOS reports the app as trusted.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Button(appState.isAccessibilityGranted ? "Open Accessibility Settings" : "Grant Accessibility Access") {
+                    appState.requestAccessibilityAccess()
                 }
             }
 
             Section("Development") {
-                Text("Keyboard remapping is not implemented yet. This build is a scaffold for the native macOS port.")
+                Text("Hold Caps Lock (or Right Command) to activate the layer; double-tap Caps Lock for real caps lock. Key remapping is next.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
         .frame(minWidth: 420, minHeight: 320)
+        .onAppear {
+            appState.refreshAccessibilityStatus()
+            appState.startSettingsPermissionPolling()
+        }
         .onDisappear {
+            appState.stopSettingsPermissionPolling()
             ConfigStore.shared.save(configuration)
         }
+    }
+
+    private var keyboardHookDescription: String {
+        if appState.isEventTapRunning {
+            return "Running"
+        }
+        if appState.isAccessibilityGranted {
+            return "Not running"
+        }
+        return "Waiting for Accessibility"
     }
 }

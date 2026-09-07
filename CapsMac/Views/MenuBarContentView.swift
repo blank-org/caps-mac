@@ -11,6 +11,12 @@ struct MenuBarContentView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
+            if !appState.isAccessibilityGranted {
+                Text("Accessibility: not granted")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Divider()
 
             Button(appState.isSuspended ? "Resume Hotkeys" : "Suspend Hotkeys") {
@@ -18,7 +24,9 @@ struct MenuBarContentView: View {
             }
 
             if #available(macOS 14.0, *) {
-                SettingsLink("Settings…")
+                SettingsLink {
+                    Text("Settings…")
+                }
             } else {
                 Button("Settings…") {
                     NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
