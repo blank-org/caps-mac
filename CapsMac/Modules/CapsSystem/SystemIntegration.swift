@@ -3,10 +3,13 @@ import Foundation
 
 /// macOS-specific integrations (media keys, display sleep, app launchers).
 enum SystemIntegration {
+    /// HID system-defined key types from `IOKit/hidsystem/ev_keymap.h`.
     private enum MediaKey: Int32 {
         case soundUp = 0
         case soundDown = 1
-        case mute = 2
+        case brightnessUp = 2
+        case brightnessDown = 3
+        case mute = 7
         case play = 16
         case next = 17
         case previous = 18
