@@ -4,14 +4,16 @@ import Foundation
 
 /// Captures Caps Lock / Right Command as the Caps layer modifier via a CGEvent tap.
 ///
-/// Key remapping is still ahead; this handler owns the layer key, swallows native
-/// Caps Lock toggling, and drives `CapsModifierState` (hold, double-tap lock, suspend).
+/// Captures Caps Lock / Right Command as the Caps layer modifier via a CGEvent tap,
+/// and remaps the navigation cluster while the layer is active.
 final class CapsInputHandler {
     var onStateChange: ((CapsModifierState) -> Void)?
 
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var releasePollTimer: Timer?
+    private let keyMap = KeyMap()
+    private var heldRemappedKeys = Set<CGKeyCode>()
 
     private var state = CapsModifierState()
     private var capsIsHeld = false
@@ -59,6 +61,7 @@ final class CapsInputHandler {
     }
 
     func resetTransientState(publishAfter: Bool = true) {
+        releaseHeldRemaps()
         stopReleasePoller()
         capsIsHeld = false
         rightCommandIsHeld = false
@@ -137,6 +140,10 @@ final class CapsInputHandler {
             return handleRightCommand(type: type, event: event)
         }
 
+        if state.isLayerActive {
+            return handleLayerKey(type: type, event: event, keyCode: keyCode)
+        }
+
         return Unmanaged.passUnretained(event)
     }
 
@@ -195,6 +202,46 @@ final class CapsInputHandler {
         return nil
     }
 
+    private func handleLayerKey(type: CGEventType, event: CGEvent, keyCode: CGKeyCode) -> Unmanaged<CGEvent>? {
+        guard type == .keyDown || type == .keyUp else {
+            return Unmanaged.passUnretained(event)
+        }
+
+        let action = keyMap.action(forVirtualKey: keyCode)
+        guard let remapped = action.navigationKeyCode else {
+            return Unmanaged.passUnretained(event)
+        }
+
+        if type == .keyDown {
+            heldRemappedKeys.insert(remapped)
+        } else {
+            heldRemappedKeys.remove(remapped)
+        }
+
+        event.setIntegerValueField(.keyboardEventKeycode, value: Int64(remapped))
+        var flags = event.flags
+        flags.remove(.maskCommand)
+        flags.remove(.maskAlphaShift)
+        event.flags = flags
+        return Unmanaged.passUnretained(event)
+    }
+
+    private func releaseHeldRemaps() {
+        let keys = heldRemappedKeys
+        heldRemappedKeys.removeAll()
+        for key in keys {
+            postInjectedKey(key, keyDown: false)
+        }
+    }
+
+    private func postInjectedKey(_ keyCode: CGKeyCode, keyDown: Bool) {
+        let source = CGEventSource(stateID: .hidSystemState)
+        source?.userData = Self.injectedUserData
+        guard let event = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: keyDown) else { return }
+        event.setIntegerValueField(.eventSourceUserData, value: Self.injectedUserData)
+        event.post(tap: .cgSessionEventTap)
+    }
+
     private func capsDown() {
         if capsIsHeld { return }
         capsIsHeld = true
@@ -213,6 +260,7 @@ final class CapsInputHandler {
         if now - lastCapsLockTime < Self.doubleTapInterval && lastCapsLockTime > 0 {
             state.isCapsLockEngaged = true
             state.isLayerHeld = false
+            releaseHeldRemaps()
             setHardwareCapsLock(enabled: true)
         } else {
             state.isLayerHeld = true
@@ -228,6 +276,7 @@ final class CapsInputHandler {
         stopReleasePoller()
         if !state.isCapsLockEngaged && !rightCommandIsHeld {
             state.isLayerHeld = false
+            releaseHeldRemaps()
         }
         publish()
     }
@@ -245,6 +294,7 @@ final class CapsInputHandler {
             rightCommandIsHeld = false
             if !capsIsHeld && !state.isCapsLockEngaged {
                 state.isLayerHeld = false
+                releaseHeldRemaps()
             }
             publish()
         }

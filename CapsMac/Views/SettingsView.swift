@@ -37,7 +37,7 @@ struct SettingsView: View {
             }
 
             Section("Development") {
-                Text("Hold Caps Lock (or Right Command) to activate the layer; double-tap Caps Lock for real caps lock. Key remapping is next.")
+                Text("Hold Caps Lock (or Right Command) for the layer. WASD / IJKL are arrows; T/Y home/end; U/R page up/down. Media and app shortcuts are next.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -1,3 +1,5 @@
+import Carbon.HIToolbox
+import CoreGraphics
 import Foundation
 
 /// Maps physical keys to Caps-layer actions.
@@ -10,15 +12,31 @@ struct KeyMap {
         self.bindings = bindings
     }
 
-    func action(forKeyCode keyCode: UInt16) -> ShortcutAction {
-        bindings[String(keyCode), default: .unmapped]
+    func action(forVirtualKey keyCode: CGKeyCode) -> ShortcutAction {
+        Self.virtualKeyBindings[keyCode] ?? .unmapped
     }
 
     func action(forKeyLabel label: String) -> ShortcutAction {
         bindings[label.lowercased(), default: .unmapped]
     }
 
-    /// Minimal seed map for development; expand toward Windows parity.
+    /// Hardware key codes for the live event tap. Navigation cluster first.
+    static let virtualKeyBindings: [CGKeyCode: ShortcutAction] = [
+        CGKeyCode(kVK_ANSI_W): .moveUp,
+        CGKeyCode(kVK_ANSI_A): .moveLeft,
+        CGKeyCode(kVK_ANSI_S): .moveDown,
+        CGKeyCode(kVK_ANSI_D): .moveRight,
+        CGKeyCode(kVK_ANSI_I): .moveUp,
+        CGKeyCode(kVK_ANSI_J): .moveLeft,
+        CGKeyCode(kVK_ANSI_K): .moveDown,
+        CGKeyCode(kVK_ANSI_L): .moveRight,
+        CGKeyCode(kVK_ANSI_T): .home,
+        CGKeyCode(kVK_ANSI_Y): .end,
+        CGKeyCode(kVK_ANSI_U): .pageUp,
+        CGKeyCode(kVK_ANSI_R): .pageDown,
+    ]
+
+    /// Label map for config/UI; expand toward Windows parity.
     static let defaultBindings: [String: ShortcutAction] = [
         "w": .moveUp,
         "a": .moveLeft,

@@ -2,7 +2,7 @@
 
 Native Swift/SwiftUI port of [Caps](../README.md) — a menu-bar keyboard utility that turns **Caps Lock** into a hold-modifier for home-row navigation, editing, media, and more.
 
-> **Status:** menu-bar shell plus Caps Lock layer tracking. Accessibility status live-updates in Settings; a CGEvent tap owns Caps Lock / Right Command. Key remapping is not implemented yet.
+> **Status:** menu-bar utility with a live Accessibility indicator, single-instance launch, Caps Lock / Right Command layer, and home-row navigation remaps (WASD / IJKL arrows, T/Y home/end, U/R page up/down). Media, mouse, and app shortcuts are not implemented yet.
 
 ## Requirements
 
@@ -31,7 +31,7 @@ macos/
 │   ├── Views/             # Menu bar menu, Settings, About
 │   ├── Modules/
 │   │   ├── CapsInput/     # CGEvent tap / Caps Lock layer state
-│   │   ├── CapsKeyMap/    # Key → action map (stubs)
+│   │   ├── CapsKeyMap/    # Key → action map (navigation live)
 │   │   ├── CapsConfig/    # Configuration persistence (stubs)
 │   │   └── CapsSystem/    # Accessibility, media, app launch (stubs)
 │   └── Resources/         # Info.plist, Assets
@@ -42,8 +42,8 @@ macos/
 
 | Module | Responsibility |
 |--------|----------------|
-| **CapsInput** | CGEvent tap: Caps Lock hold / double-tap lock, Right Command alternate layer |
-| **CapsKeyMap** | Map physical keys to actions (parity with `resource/map_caps.csv`) |
+| **CapsInput** | CGEvent tap: Caps Lock / Right Command layer plus navigation remaps |
+| **CapsKeyMap** | WASD / IJKL arrows, T/Y home/end, U/R page up/down; more keys still stubbed |
 | **CapsConfig** | User settings (`~/Library/Application Support/Caps/config.json`) |
 | **CapsSystem** | Accessibility permission, volume/media, display sleep, app launchers |
 
@@ -73,6 +73,6 @@ The shipping Windows build lives at the repo root (`caps.ahk` → `caps.exe`). S
 
 ## Next steps
 
-1. Expand `KeyMap` toward Windows parity using `resource/map_caps.csv` (WASD / IJKL arrows first).
+1. Expand `KeyMap` toward Windows parity (selection, media, mouse, apps).
 2. Implement `SystemIntegration` actions (volume, Terminal, VS Code, dark mode).
 3. Add Input Monitoring entitlement if required for certain key paths.

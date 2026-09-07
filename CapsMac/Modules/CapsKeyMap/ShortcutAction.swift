@@ -1,3 +1,5 @@
+import Carbon.HIToolbox
+import CoreGraphics
 import Foundation
 
 /// A single remapped action triggered while the Caps layer is active.
@@ -53,6 +55,21 @@ enum ShortcutAction: String, CaseIterable, Codable {
         case .sleepDisplay: return "Sleep Display"
         case .pasteType: return "Paste Type"
         case .unmapped: return "Unmapped"
+        }
+    }
+
+    /// Virtual key to emit while the Caps layer is held. `nil` means not a keyboard remap yet.
+    var navigationKeyCode: CGKeyCode? {
+        switch self {
+        case .moveUp: return CGKeyCode(kVK_UpArrow)
+        case .moveDown: return CGKeyCode(kVK_DownArrow)
+        case .moveLeft: return CGKeyCode(kVK_LeftArrow)
+        case .moveRight: return CGKeyCode(kVK_RightArrow)
+        case .home: return CGKeyCode(kVK_Home)
+        case .end: return CGKeyCode(kVK_End)
+        case .pageUp: return CGKeyCode(kVK_PageUp)
+        case .pageDown: return CGKeyCode(kVK_PageDown)
+        default: return nil
         }
     }
 }
