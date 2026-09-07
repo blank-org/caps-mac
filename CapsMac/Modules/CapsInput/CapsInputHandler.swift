@@ -265,6 +265,11 @@ final class CapsInputHandler {
                 performMedia(action)
             }
             return nil
+        case .sleepDisplay:
+            if type == .keyDown && !isRepeat {
+                SystemIntegration.sleepSystem()
+            }
+            return nil
         default:
             return Unmanaged.passUnretained(event)
         }

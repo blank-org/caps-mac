@@ -32,8 +32,19 @@ enum SystemIntegration {
         }
     }
 
+    static func sleepSystem() {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
+        process.arguments = ["sleepnow"]
+        do {
+            try process.run()
+        } catch {
+            fputs("CapsMac: failed to sleep: \(error)\n", stderr)
+        }
+    }
+
     static func sleepDisplay() {
-        // Stub: IOKit display sleep call will live here.
+        // Stub: IOKit display sleep (Windows Caps+Z) will live here.
     }
 
     static func setDarkMode(enabled: Bool) {

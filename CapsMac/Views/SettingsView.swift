@@ -37,7 +37,7 @@ struct SettingsView: View {
             }
 
             Section("Development") {
-                Text("Tap Caps Lock for normal caps. Hold Caps Lock (or Right Command) for the layer. WASD / IJKL arrows; E/F/G/H selection; O [ ; P ] \\ media. Mouse and app shortcuts are next.")
+                Text("Tap Caps Lock for normal caps. Hold Caps Lock (or Right Command) for the layer. WASD / IJKL arrows; E/F/G/H selection; O [ ; P ] \\ media; Q sleeps. Mouse and app shortcuts are next.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

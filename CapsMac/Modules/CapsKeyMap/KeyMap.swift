@@ -51,6 +51,7 @@ struct KeyMap {
         CGKeyCode(kVK_ANSI_P): .playPause,
         CGKeyCode(kVK_ANSI_RightBracket): .previousTrack,
         CGKeyCode(kVK_ANSI_Backslash): .nextTrack,
+        CGKeyCode(kVK_ANSI_Q): .sleepDisplay,
     ]
 
     /// Label map for config/UI; expand toward Windows parity.

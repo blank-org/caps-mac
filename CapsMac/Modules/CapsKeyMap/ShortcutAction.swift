@@ -89,7 +89,7 @@ enum ShortcutAction: String, CaseIterable, Codable {
         case .openEditor: return "Open Editor"
         case .toggleDarkMode: return "Toggle Dark Mode"
         case .showKeyboardMap: return "Show Keyboard Map"
-        case .sleepDisplay: return "Sleep Display"
+        case .sleepDisplay: return "Sleep"
         case .pasteType: return "Paste Type"
         case .unmapped: return "Unmapped"
         }

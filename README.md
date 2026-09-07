@@ -2,7 +2,7 @@
 
 Native Swift/SwiftUI port of [Caps](../README.md) — a menu-bar keyboard utility that turns **Caps Lock** into a hold-modifier for home-row navigation, editing, media, and more.
 
-> **Status:** menu-bar utility with Accessibility status, single-instance launch, tap Caps Lock for normal caps / hold for the layer (Right Command is hold-only), home-row remaps, and media keys. Mouse and remaining app shortcuts are not implemented yet.
+> **Status:** menu-bar utility with Accessibility status, single-instance launch, tap Caps Lock for normal caps / hold for the layer (Right Command is hold-only), home-row remaps, media keys, and Caps+Q sleep. Mouse and remaining app shortcuts are not implemented yet.
 
 ## Requirements
 
@@ -45,7 +45,7 @@ macos/
 | **CapsInput** | CGEvent tap: tap Caps Lock toggles caps; hold Caps Lock / Right Command activates the layer |
 | **CapsKeyMap** | Arrows, selection, word/browser jumps, Backspace → Delete, media keys |
 | **CapsConfig** | User settings (`~/Library/Application Support/Caps/config.json`) |
-| **CapsSystem** | Accessibility permission, volume/media keys; app launchers still stubbed |
+| **CapsSystem** | Accessibility, volume/media keys, Caps+Q sleep; app launchers still stubbed |
 
 ## Accessibility permission
 
@@ -73,6 +73,6 @@ The shipping Windows build lives at the repo root (`caps.ahk` → `caps.exe`). S
 
 ## Next steps
 
-1. Expand `KeyMap` toward Windows parity (mouse, apps).
+1. Expand `KeyMap` toward Windows parity (mouse 1/2/3, remaining apps).
 2. Implement remaining `SystemIntegration` actions (Terminal, VS Code, dark mode, display sleep).
 3. Add Input Monitoring entitlement if required for certain key paths.
