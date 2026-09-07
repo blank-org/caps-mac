@@ -211,6 +211,10 @@ final class CapsInputHandler {
         }
 
         let action = keyMap.action(forVirtualKey: keyCode)
+        if action.remapping == nil {
+            return handleOneShot(action: action, type: type, event: event)
+        }
+
         guard var stroke = action.remapping else {
             return Unmanaged.passUnretained(event)
         }
@@ -240,6 +244,36 @@ final class CapsInputHandler {
         }
 
         return Unmanaged.passUnretained(event)
+    }
+
+    private func handleOneShot(action: ShortcutAction, type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
+        let isRepeat = event.getIntegerValueField(.keyboardEventAutorepeat) != 0
+        switch action {
+        case .volumeDown, .volumeUp:
+            if type == .keyDown {
+                performMedia(action)
+            }
+            return nil
+        case .volumeMute, .playPause, .previousTrack, .nextTrack:
+            if type == .keyDown && !isRepeat {
+                performMedia(action)
+            }
+            return nil
+        default:
+            return Unmanaged.passUnretained(event)
+        }
+    }
+
+    private func performMedia(_ action: ShortcutAction) {
+        switch action {
+        case .volumeDown: SystemIntegration.volumeDown()
+        case .volumeUp: SystemIntegration.volumeUp()
+        case .volumeMute: SystemIntegration.volumeMute()
+        case .playPause: SystemIntegration.playPause()
+        case .previousTrack: SystemIntegration.previousTrack()
+        case .nextTrack: SystemIntegration.nextTrack()
+        default: break
+        }
     }
 
     private func releaseHeldRemaps() {

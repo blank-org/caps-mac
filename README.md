@@ -2,7 +2,7 @@
 
 Native Swift/SwiftUI port of [Caps](../README.md) — a menu-bar keyboard utility that turns **Caps Lock** into a hold-modifier for home-row navigation, editing, media, and more.
 
-> **Status:** menu-bar utility with Accessibility status, single-instance launch, Caps Lock / Right Command layer, and home-row keyboard remaps (arrows, selection, word jump/select, Backspace → Delete). Media, mouse, and app shortcuts are not implemented yet.
+> **Status:** menu-bar utility with Accessibility status, single-instance launch, Caps Lock / Right Command layer, home-row keyboard remaps (arrows, selection, word jump, Backspace → Delete), and media keys (volume / play / track). Mouse and app shortcuts are not implemented yet.
 
 ## Requirements
 
@@ -33,7 +33,7 @@ macos/
 │   │   ├── CapsInput/     # CGEvent tap / Caps Lock layer state
 │   │   ├── CapsKeyMap/    # Key → action map (navigation live)
 │   │   ├── CapsConfig/    # Configuration persistence (stubs)
-│   │   └── CapsSystem/    # Accessibility, media, app launch (stubs)
+│   │   └── CapsSystem/    # Accessibility, media keys, app launch (partial)
 │   └── Resources/         # Info.plist, Assets
 └── README.md              # this file
 ```
@@ -43,9 +43,9 @@ macos/
 | Module | Responsibility |
 |--------|----------------|
 | **CapsInput** | CGEvent tap: layer keys plus navigation, selection, and delete remaps |
-| **CapsKeyMap** | Arrows, Home/End/Page, E/F/G/H selection, V/N/C/M/X/, word and browser jumps, Backspace → Delete |
+| **CapsKeyMap** | Arrows, selection, word/browser jumps, Backspace → Delete, media keys |
 | **CapsConfig** | User settings (`~/Library/Application Support/Caps/config.json`) |
-| **CapsSystem** | Accessibility permission, volume/media, display sleep, app launchers |
+| **CapsSystem** | Accessibility permission, volume/media keys; app launchers still stubbed |
 
 ## Accessibility permission
 
@@ -73,6 +73,6 @@ The shipping Windows build lives at the repo root (`caps.ahk` → `caps.exe`). S
 
 ## Next steps
 
-1. Expand `KeyMap` toward Windows parity (media, mouse, apps).
-2. Implement `SystemIntegration` actions (volume, Terminal, VS Code, dark mode).
+1. Expand `KeyMap` toward Windows parity (mouse, apps).
+2. Implement remaining `SystemIntegration` actions (Terminal, VS Code, dark mode, display sleep).
 3. Add Input Monitoring entitlement if required for certain key paths.

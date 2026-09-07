@@ -45,6 +45,12 @@ struct KeyMap {
         CGKeyCode(kVK_ANSI_X): .browserBack,
         CGKeyCode(kVK_ANSI_Comma): .browserForward,
         CGKeyCode(kVK_Delete): .deleteForward,
+        CGKeyCode(kVK_ANSI_O): .volumeDown,
+        CGKeyCode(kVK_ANSI_LeftBracket): .volumeUp,
+        CGKeyCode(kVK_ANSI_Semicolon): .volumeMute,
+        CGKeyCode(kVK_ANSI_P): .playPause,
+        CGKeyCode(kVK_ANSI_RightBracket): .previousTrack,
+        CGKeyCode(kVK_ANSI_Backslash): .nextTrack,
     ]
 
     /// Label map for config/UI; expand toward Windows parity.

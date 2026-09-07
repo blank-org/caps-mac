@@ -37,7 +37,7 @@ struct SettingsView: View {
             }
 
             Section("Development") {
-                Text("Hold Caps Lock (or Right Command) for the layer. WASD / IJKL arrows; E/F select; G/H word-select; V/N word-jump; Backspace deletes forward. Media and app shortcuts are next.")
+                Text("Hold Caps Lock (or Right Command) for the layer. WASD / IJKL arrows; E/F/G/H selection; V/N word-jump; O [ ; P ] \\ media; Backspace deletes forward. Mouse and app shortcuts are next.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
