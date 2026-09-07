@@ -10,6 +10,7 @@
 		5F3A1B2C3D4E5F6071829401 /* CapsMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C1 /* CapsMacApp.swift */; };
 		5F3A1B2C3D4E5F6071829402 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C2 /* AppDelegate.swift */; };
 		5F3A1B2C3D4E5F6071829403 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C3 /* AppState.swift */; };
+		5F3A1B2C3D4E5F6071829412 /* SingleInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293CF /* SingleInstance.swift */; };
 		5F3A1B2C3D4E5F6071829404 /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C4 /* MenuBarContentView.swift */; };
 		5F3A1B2C3D4E5F6071829405 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C5 /* SettingsView.swift */; };
 		5F3A1B2C3D4E5F6071829406 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C6 /* AboutView.swift */; };
@@ -29,6 +30,7 @@
 		5F3A1B2C3D4E5F60718293C1 /* CapsMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsMacApp.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293C2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293C3 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		5F3A1B2C3D4E5F60718293CF /* SingleInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleInstance.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293C4 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293C5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293C6 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 			children = (
 				5F3A1B2C3D4E5F60718293C2 /* AppDelegate.swift */,
 				5F3A1B2C3D4E5F60718293C3 /* AppState.swift */,
+				5F3A1B2C3D4E5F60718293CF /* SingleInstance.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -230,6 +233,7 @@
 				5F3A1B2C3D4E5F6071829401 /* CapsMacApp.swift in Sources */,
 				5F3A1B2C3D4E5F6071829402 /* AppDelegate.swift in Sources */,
 				5F3A1B2C3D4E5F6071829403 /* AppState.swift in Sources */,
+				5F3A1B2C3D4E5F6071829412 /* SingleInstance.swift in Sources */,
 				5F3A1B2C3D4E5F6071829404 /* MenuBarContentView.swift in Sources */,
 				5F3A1B2C3D4E5F6071829405 /* SettingsView.swift in Sources */,
 				5F3A1B2C3D4E5F6071829406 /* AboutView.swift in Sources */,

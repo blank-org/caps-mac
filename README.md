@@ -18,7 +18,7 @@ open macos/CapsMac.xcodeproj
 
 Select the **CapsMac** scheme, then **Product → Run** (⌘R).
 
-The app runs as a **menu-bar utility** (`LSUIElement`): no Dock icon. Look for the keyboard icon in the menu bar.
+The app runs as a **menu-bar utility** (`LSUIElement`): no Dock icon. Look for the keyboard icon in the menu bar. Launch Services refuses a second copy; a new launch (including Xcode Run) closes any stale Caps process so only one keyboard hook is active.
 
 ## Project layout
 

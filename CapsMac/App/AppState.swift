@@ -20,6 +20,7 @@ final class AppState: ObservableObject {
     }
 
     init() {
+        SingleInstance.terminateStaleCopies()
         inputHandler.onStateChange = { [weak self] state in
             guard let self else { return }
             self.modifierState = state
