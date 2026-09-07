@@ -2,18 +2,21 @@ import Carbon.HIToolbox
 import CoreGraphics
 import Foundation
 
-/// Captures Caps Lock / Right Command as the Caps layer modifier via a CGEvent tap.
-///
 /// Captures Caps Lock / Right Command as the Caps layer modifier via a CGEvent tap,
-/// and remaps the navigation cluster while the layer is active.
+/// and remaps navigation, selection, and delete keys while the layer is active.
 final class CapsInputHandler {
+    private struct HeldStroke: Hashable {
+        let keyCode: CGKeyCode
+        let flags: CGEventFlags.RawValue
+    }
+
     var onStateChange: ((CapsModifierState) -> Void)?
 
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var releasePollTimer: Timer?
     private let keyMap = KeyMap()
-    private var heldRemappedKeys = Set<CGKeyCode>()
+    private var heldRemaps: [HeldStroke: Int] = [:]
 
     private var state = CapsModifierState()
     private var capsIsHeld = false
@@ -208,36 +211,50 @@ final class CapsInputHandler {
         }
 
         let action = keyMap.action(forVirtualKey: keyCode)
-        guard let remapped = action.navigationKeyCode else {
+        guard var stroke = action.remapping else {
             return Unmanaged.passUnretained(event)
         }
 
-        if type == .keyDown {
-            heldRemappedKeys.insert(remapped)
-        } else {
-            heldRemappedKeys.remove(remapped)
+        if action == .deleteForward, event.flags.contains(.maskControl) || event.flags.contains(.maskCommand) {
+            stroke = RemappedStroke(keyCode: CGKeyCode(kVK_ForwardDelete), addedFlags: .maskAlternate)
         }
 
-        event.setIntegerValueField(.keyboardEventKeycode, value: Int64(remapped))
         var flags = event.flags
         flags.remove(.maskCommand)
+        flags.remove(.maskControl)
         flags.remove(.maskAlphaShift)
+        flags.insert(stroke.addedFlags)
+
+        event.setIntegerValueField(.keyboardEventKeycode, value: Int64(stroke.keyCode))
         event.flags = flags
+
+        let held = HeldStroke(keyCode: stroke.keyCode, flags: flags.rawValue)
+        if type == .keyDown {
+            heldRemaps[held, default: 0] += 1
+        } else if let count = heldRemaps[held] {
+            if count <= 1 {
+                heldRemaps.removeValue(forKey: held)
+            } else {
+                heldRemaps[held] = count - 1
+            }
+        }
+
         return Unmanaged.passUnretained(event)
     }
 
     private func releaseHeldRemaps() {
-        let keys = heldRemappedKeys
-        heldRemappedKeys.removeAll()
-        for key in keys {
-            postInjectedKey(key, keyDown: false)
+        let held = heldRemaps
+        heldRemaps.removeAll()
+        for (stroke, _) in held {
+            postInjectedKey(stroke.keyCode, keyDown: false, flags: CGEventFlags(rawValue: stroke.flags))
         }
     }
 
-    private func postInjectedKey(_ keyCode: CGKeyCode, keyDown: Bool) {
+    private func postInjectedKey(_ keyCode: CGKeyCode, keyDown: Bool, flags: CGEventFlags = []) {
         let source = CGEventSource(stateID: .hidSystemState)
         source?.userData = Self.injectedUserData
         guard let event = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: keyDown) else { return }
+        event.flags = flags
         event.setIntegerValueField(.eventSourceUserData, value: Self.injectedUserData)
         event.post(tap: .cgSessionEventTap)
     }

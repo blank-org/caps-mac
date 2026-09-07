@@ -20,7 +20,7 @@ struct KeyMap {
         bindings[label.lowercased(), default: .unmapped]
     }
 
-    /// Hardware key codes for the live event tap. Navigation cluster first.
+    /// Hardware key codes for the live event tap.
     static let virtualKeyBindings: [CGKeyCode: ShortcutAction] = [
         CGKeyCode(kVK_ANSI_W): .moveUp,
         CGKeyCode(kVK_ANSI_A): .moveLeft,
@@ -34,6 +34,17 @@ struct KeyMap {
         CGKeyCode(kVK_ANSI_Y): .end,
         CGKeyCode(kVK_ANSI_U): .pageUp,
         CGKeyCode(kVK_ANSI_R): .pageDown,
+        CGKeyCode(kVK_ANSI_E): .selectUp,
+        CGKeyCode(kVK_ANSI_F): .selectDown,
+        CGKeyCode(kVK_ANSI_G): .selectWordLeft,
+        CGKeyCode(kVK_ANSI_H): .selectWordRight,
+        CGKeyCode(kVK_ANSI_V): .wordLeft,
+        CGKeyCode(kVK_ANSI_N): .wordRight,
+        CGKeyCode(kVK_ANSI_C): .historyBack,
+        CGKeyCode(kVK_ANSI_M): .historyForward,
+        CGKeyCode(kVK_ANSI_X): .browserBack,
+        CGKeyCode(kVK_ANSI_Comma): .browserForward,
+        CGKeyCode(kVK_Delete): .deleteForward,
     ]
 
     /// Label map for config/UI; expand toward Windows parity.
@@ -50,6 +61,17 @@ struct KeyMap {
         "y": .end,
         "u": .pageUp,
         "r": .pageDown,
+        "e": .selectUp,
+        "f": .selectDown,
+        "g": .selectWordLeft,
+        "h": .selectWordRight,
+        "v": .wordLeft,
+        "n": .wordRight,
+        "c": .historyBack,
+        "m": .historyForward,
+        "x": .browserBack,
+        ",": .browserForward,
+        "backspace": .deleteForward,
         "o": .volumeDown,
         "p": .playPause,
         "[": .volumeUp,

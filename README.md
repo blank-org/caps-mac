@@ -2,7 +2,7 @@
 
 Native Swift/SwiftUI port of [Caps](../README.md) — a menu-bar keyboard utility that turns **Caps Lock** into a hold-modifier for home-row navigation, editing, media, and more.
 
-> **Status:** menu-bar utility with a live Accessibility indicator, single-instance launch, Caps Lock / Right Command layer, and home-row navigation remaps (WASD / IJKL arrows, T/Y home/end, U/R page up/down). Media, mouse, and app shortcuts are not implemented yet.
+> **Status:** menu-bar utility with Accessibility status, single-instance launch, Caps Lock / Right Command layer, and home-row keyboard remaps (arrows, selection, word jump/select, Backspace → Delete). Media, mouse, and app shortcuts are not implemented yet.
 
 ## Requirements
 
@@ -42,8 +42,8 @@ macos/
 
 | Module | Responsibility |
 |--------|----------------|
-| **CapsInput** | CGEvent tap: Caps Lock / Right Command layer plus navigation remaps |
-| **CapsKeyMap** | WASD / IJKL arrows, T/Y home/end, U/R page up/down; more keys still stubbed |
+| **CapsInput** | CGEvent tap: layer keys plus navigation, selection, and delete remaps |
+| **CapsKeyMap** | Arrows, Home/End/Page, E/F/G/H selection, V/N/C/M/X/, word and browser jumps, Backspace → Delete |
 | **CapsConfig** | User settings (`~/Library/Application Support/Caps/config.json`) |
 | **CapsSystem** | Accessibility permission, volume/media, display sleep, app launchers |
 
@@ -73,6 +73,6 @@ The shipping Windows build lives at the repo root (`caps.ahk` → `caps.exe`). S
 
 ## Next steps
 
-1. Expand `KeyMap` toward Windows parity (selection, media, mouse, apps).
+1. Expand `KeyMap` toward Windows parity (media, mouse, apps).
 2. Implement `SystemIntegration` actions (volume, Terminal, VS Code, dark mode).
 3. Add Input Monitoring entitlement if required for certain key paths.
