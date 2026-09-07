@@ -2,7 +2,7 @@
 
 Native Swift/SwiftUI port of [Caps](../README.md) — a menu-bar keyboard utility that turns **Caps Lock** into a hold-modifier for home-row navigation, editing, media, and more.
 
-> **Status:** menu-bar utility with Accessibility status, single-instance launch, Caps Lock / Right Command layer, home-row keyboard remaps (arrows, selection, word jump, Backspace → Delete), and media keys (volume / play / track). Mouse and app shortcuts are not implemented yet.
+> **Status:** menu-bar utility with Accessibility status, single-instance launch, tap Caps Lock for normal caps / hold for the layer (Right Command is hold-only), home-row remaps, and media keys. Mouse and remaining app shortcuts are not implemented yet.
 
 ## Requirements
 
@@ -42,7 +42,7 @@ macos/
 
 | Module | Responsibility |
 |--------|----------------|
-| **CapsInput** | CGEvent tap: layer keys plus navigation, selection, and delete remaps |
+| **CapsInput** | CGEvent tap: tap Caps Lock toggles caps; hold Caps Lock / Right Command activates the layer |
 | **CapsKeyMap** | Arrows, selection, word/browser jumps, Backspace → Delete, media keys |
 | **CapsConfig** | User settings (`~/Library/Application Support/Caps/config.json`) |
 | **CapsSystem** | Accessibility permission, volume/media keys; app launchers still stubbed |

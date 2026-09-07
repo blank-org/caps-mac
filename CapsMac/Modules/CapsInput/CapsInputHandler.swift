@@ -15,19 +15,19 @@ final class CapsInputHandler {
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var releasePollTimer: Timer?
+    private var holdTimer: Timer?
     private let keyMap = KeyMap()
     private var heldRemaps: [HeldStroke: Int] = [:]
 
     private var state = CapsModifierState()
     private var capsIsHeld = false
+    private var pendingCapsTap = false
     private var rightCommandIsHeld = false
-    private var lastCapsLockTime: TimeInterval = 0
     private var capsPollSawPhysicalDown = false
-    private var desiredCapsLockLED = false
 
     private static let capsLockKeyCode = CGKeyCode(kVK_CapsLock)
     private static let rightCommandKeyCode = CGKeyCode(kVK_RightCommand)
-    private static let doubleTapInterval: TimeInterval = 0.3
+    private static let holdThreshold: TimeInterval = 0.18
     private static let injectedUserData: Int64 = 0x4341_5053 // 'CAPS'
     private static let rightCommandDeviceFlag = CGEventFlags(rawValue: 0x0000_0010)
 
@@ -65,11 +65,12 @@ final class CapsInputHandler {
 
     func resetTransientState(publishAfter: Bool = true) {
         releaseHeldRemaps()
+        stopHoldTimer()
         stopReleasePoller()
         capsIsHeld = false
+        pendingCapsTap = false
         rightCommandIsHeld = false
         state.isLayerHeld = false
-        lastCapsLockTime = 0
         if publishAfter {
             publish()
         }
@@ -115,6 +116,7 @@ final class CapsInputHandler {
         runLoopSource = source
         CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
         CGEvent.tapEnable(tap: tap, enable: true)
+        syncCapsLockEngaged()
         publish()
     }
 
@@ -141,6 +143,10 @@ final class CapsInputHandler {
         }
         if keyCode == Self.rightCommandKeyCode {
             return handleRightCommand(type: type, event: event)
+        }
+
+        if capsIsHeld && !state.isLayerHeld && !state.isSuspended {
+            activateLayerFromHold()
         }
 
         if state.isLayerActive {
@@ -296,54 +302,69 @@ final class CapsInputHandler {
     private func capsDown() {
         if capsIsHeld { return }
         capsIsHeld = true
+        pendingCapsTap = true
         capsPollSawPhysicalDown = false
+        startHoldTimer()
         startReleasePoller()
-
-        if state.isCapsLockEngaged {
-            state.isCapsLockEngaged = false
-            state.isLayerHeld = false
-            setHardwareCapsLock(enabled: false)
-            publish()
-            return
-        }
-
-        let now = ProcessInfo.processInfo.systemUptime
-        if now - lastCapsLockTime < Self.doubleTapInterval && lastCapsLockTime > 0 {
-            state.isCapsLockEngaged = true
-            state.isLayerHeld = false
-            releaseHeldRemaps()
-            setHardwareCapsLock(enabled: true)
-        } else {
-            state.isLayerHeld = true
-            setHardwareCapsLock(enabled: false)
-        }
-        lastCapsLockTime = now
         publish()
     }
 
     private func capsUp() {
         guard capsIsHeld else { return }
         capsIsHeld = false
+        stopHoldTimer()
         stopReleasePoller()
-        if !state.isCapsLockEngaged && !rightCommandIsHeld {
+
+        let shouldToggleCaps = pendingCapsTap
+        pendingCapsTap = false
+
+        if state.isLayerHeld && !rightCommandIsHeld {
             state.isLayerHeld = false
             releaseHeldRemaps()
         }
+
+        if shouldToggleCaps {
+            toggleHardwareCapsLock()
+        }
+        syncCapsLockEngaged()
         publish()
+    }
+
+    private func activateLayerFromHold() {
+        guard capsIsHeld else { return }
+        pendingCapsTap = false
+        stopHoldTimer()
+        guard !state.isLayerHeld else { return }
+        state.isLayerHeld = true
+        publish()
+    }
+
+    private func startHoldTimer() {
+        stopHoldTimer()
+        let timer = Timer(timeInterval: Self.holdThreshold, repeats: false) { [weak self] _ in
+            self?.activateLayerFromHold()
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        holdTimer = timer
+    }
+
+    private func stopHoldTimer() {
+        holdTimer?.invalidate()
+        holdTimer = nil
     }
 
     private func setRightCommandHeld(_ down: Bool) {
         if down {
             guard !rightCommandIsHeld else { return }
             rightCommandIsHeld = true
-            if !state.isCapsLockEngaged {
-                state.isLayerHeld = true
-            }
+            pendingCapsTap = false
+            stopHoldTimer()
+            state.isLayerHeld = true
             publish()
         } else {
             guard rightCommandIsHeld else { return }
             rightCommandIsHeld = false
-            if !capsIsHeld && !state.isCapsLockEngaged {
+            if !capsIsHeld {
                 state.isLayerHeld = false
                 releaseHeldRemaps()
             }
@@ -379,20 +400,32 @@ final class CapsInputHandler {
         }
     }
 
-    private func setHardwareCapsLock(enabled: Bool) {
-        desiredCapsLockLED = enabled
-        DispatchQueue.main.async { [weak self] in
-            self?.alignHardwareCapsLock(remainingTries: 6)
+    private func toggleHardwareCapsLock() {
+        let currentlyOn = CGEventSource.flagsState(.hidSystemState).contains(.maskAlphaShift)
+        postInjectedCapsLockPulse()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            self?.alignHardwareCapsLock(enabled: !currentlyOn, remainingTries: 6)
         }
     }
 
-    private func alignHardwareCapsLock(remainingTries: Int) {
+    private func syncCapsLockEngaged() {
+        state.isCapsLockEngaged = CGEventSource.flagsState(.hidSystemState).contains(.maskAlphaShift)
+    }
+
+    private func alignHardwareCapsLock(enabled: Bool, remainingTries: Int) {
         let currentlyOn = CGEventSource.flagsState(.hidSystemState).contains(.maskAlphaShift)
-        guard currentlyOn != desiredCapsLockLED else { return }
-        guard remainingTries > 0 else { return }
+        state.isCapsLockEngaged = currentlyOn
+        guard currentlyOn != enabled else {
+            publish()
+            return
+        }
+        guard remainingTries > 0 else {
+            publish()
+            return
+        }
         postInjectedCapsLockPulse()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) { [weak self] in
-            self?.alignHardwareCapsLock(remainingTries: remainingTries - 1)
+            self?.alignHardwareCapsLock(enabled: enabled, remainingTries: remainingTries - 1)
         }
     }
 
