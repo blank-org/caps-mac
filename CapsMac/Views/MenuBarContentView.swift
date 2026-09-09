@@ -33,6 +33,10 @@ struct MenuBarContentView: View {
                 }
             }
 
+            Button("Keyboard Map") {
+                SystemIntegration.showKeyboardMap()
+            }
+
             Button("About Caps") {
                 openWindow(id: "about")
             }

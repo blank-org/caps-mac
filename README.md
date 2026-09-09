@@ -2,7 +2,7 @@
 
 Native Swift/SwiftUI port of [Caps](../README.md) — a menu-bar keyboard utility that turns **Caps Lock** into a hold-modifier for home-row navigation, editing, media, and more.
 
-> **Status:** menu-bar utility with Accessibility status, single-instance launch, tap Caps Lock for normal caps / hold for the layer (Right Command is hold-only), home-row remaps, media keys, and Caps+Q sleep. Mouse and remaining app shortcuts are not implemented yet.
+> **Status:** menu-bar utility with Accessibility status, single-instance launch, tap Caps Lock for normal caps / hold for the layer (Right Command is hold-only), home-row remaps, media keys, Caps+Q sleep, and Caps+= (or the menu bar item) for the keyboard map. Mouse and remaining app shortcuts are not implemented yet.
 
 ## Requirements
 
@@ -28,13 +28,13 @@ macos/
 ├── CapsMac/
 │   ├── CapsMacApp.swift   # @main entry, MenuBarExtra + Settings
 │   ├── App/               # AppDelegate, shared AppState
-│   ├── Views/             # Menu bar menu, Settings, About
+│   ├── Views/             # Menu bar menu, Settings, About, keyboard map window
 │   ├── Modules/
 │   │   ├── CapsInput/     # CGEvent tap / Caps Lock layer state
 │   │   ├── CapsKeyMap/    # Key → action map (navigation live)
 │   │   ├── CapsConfig/    # Configuration persistence (stubs)
 │   │   └── CapsSystem/    # Accessibility, media keys, app launch (partial)
-│   └── Resources/         # Info.plist, Assets
+│   └── Resources/         # Info.plist, Assets, keyboard-map-tks.svg
 └── README.md              # this file
 ```
 
@@ -43,9 +43,9 @@ macos/
 | Module | Responsibility |
 |--------|----------------|
 | **CapsInput** | CGEvent tap: tap Caps Lock toggles caps; hold Caps Lock / Right Command activates the layer |
-| **CapsKeyMap** | Arrows, selection, word/browser jumps, Backspace → Delete, media keys |
+| **CapsKeyMap** | Arrows, selection, word/browser jumps, Backspace → Delete, media keys, Caps+= map |
 | **CapsConfig** | User settings (`~/Library/Application Support/Caps/config.json`) |
-| **CapsSystem** | Accessibility, volume/media keys, Caps+Q sleep; app launchers still stubbed |
+| **CapsSystem** | Accessibility, volume/media keys, Caps+Q sleep, keyboard map window; app launchers still stubbed |
 
 ## Accessibility permission
 
@@ -70,6 +70,10 @@ open build/DerivedData/Build/Products/Debug/CapsMac.app
 ## Windows reference
 
 The shipping Windows build lives at the repo root (`caps.ahk` → `caps.exe`). See [README.md](../README.md) and [APP_FEATURES.md](../APP_FEATURES.md) for the full shortcut map.
+
+## Keyboard map
+
+Hold **Caps Lock** and press **=**, or choose **Keyboard Map** from the menu bar. The same Windows SVG (`keyboard-map-tks.svg`) opens in an in-app window.
 
 ## Next steps
 

@@ -14,6 +14,9 @@
 		5F3A1B2C3D4E5F6071829404 /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C4 /* MenuBarContentView.swift */; };
 		5F3A1B2C3D4E5F6071829405 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C5 /* SettingsView.swift */; };
 		5F3A1B2C3D4E5F6071829406 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C6 /* AboutView.swift */; };
+		5F3A1B2C3D4E5F6071829413 /* KeyboardMapWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293D3 /* KeyboardMapWindow.swift */; };
+		5F3A1B2C3D4E5F6071829414 /* keyboard-map-tks.svg in Resources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293D4 /* keyboard-map-tks.svg */; };
+		5F3A1B2C3D4E5F6071829415 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293D5 /* WebKit.framework */; };
 		5F3A1B2C3D4E5F6071829407 /* CapsModifierState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C7 /* CapsModifierState.swift */; };
 		5F3A1B2C3D4E5F6071829408 /* CapsInputHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C8 /* CapsInputHandler.swift */; };
 		5F3A1B2C3D4E5F6071829409 /* ShortcutAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293C9 /* ShortcutAction.swift */; };
@@ -34,6 +37,9 @@
 		5F3A1B2C3D4E5F60718293C4 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293C5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293C6 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		5F3A1B2C3D4E5F60718293D3 /* KeyboardMapWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardMapWindow.swift; sourceTree = "<group>"; };
+		5F3A1B2C3D4E5F60718293D4 /* keyboard-map-tks.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = "keyboard-map-tks.svg"; sourceTree = "<group>"; };
+		5F3A1B2C3D4E5F60718293D5 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		5F3A1B2C3D4E5F60718293C7 /* CapsModifierState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsModifierState.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293C8 /* CapsInputHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsInputHandler.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293C9 /* ShortcutAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutAction.swift; sourceTree = "<group>"; };
@@ -51,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F3A1B2C3D4E5F6071829415 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +69,16 @@
 			children = (
 				5F3A1B2C3D4E5F60718293B3 /* CapsMac */,
 				5F3A1B2C3D4E5F60718293B4 /* Products */,
+				5F3A1B2C3D4E5F60718293E9 /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		5F3A1B2C3D4E5F60718293E9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5F3A1B2C3D4E5F60718293D5 /* WebKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		5F3A1B2C3D4E5F60718293B3 /* CapsMac */ = {
@@ -101,6 +117,7 @@
 				5F3A1B2C3D4E5F60718293C4 /* MenuBarContentView.swift */,
 				5F3A1B2C3D4E5F60718293C5 /* SettingsView.swift */,
 				5F3A1B2C3D4E5F60718293C6 /* AboutView.swift */,
+				5F3A1B2C3D4E5F60718293D3 /* KeyboardMapWindow.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -157,6 +174,7 @@
 			children = (
 				5F3A1B2C3D4E5F60718293D1 /* Assets.xcassets */,
 				5F3A1B2C3D4E5F60718293D2 /* Info.plist */,
+				5F3A1B2C3D4E5F60718293D4 /* keyboard-map-tks.svg */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -220,6 +238,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5F3A1B2C3D4E5F6071829411 /* Assets.xcassets in Resources */,
+				5F3A1B2C3D4E5F6071829414 /* keyboard-map-tks.svg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,6 +256,7 @@
 				5F3A1B2C3D4E5F6071829404 /* MenuBarContentView.swift in Sources */,
 				5F3A1B2C3D4E5F6071829405 /* SettingsView.swift in Sources */,
 				5F3A1B2C3D4E5F6071829406 /* AboutView.swift in Sources */,
+				5F3A1B2C3D4E5F6071829413 /* KeyboardMapWindow.swift in Sources */,
 				5F3A1B2C3D4E5F6071829407 /* CapsModifierState.swift in Sources */,
 				5F3A1B2C3D4E5F6071829408 /* CapsInputHandler.swift in Sources */,
 				5F3A1B2C3D4E5F6071829409 /* ShortcutAction.swift in Sources */,

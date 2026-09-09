@@ -43,6 +43,12 @@ enum SystemIntegration {
         }
     }
 
+    static func showKeyboardMap() {
+        DispatchQueue.main.async {
+            KeyboardMapWindowController.shared.showMap()
+        }
+    }
+
     static func sleepDisplay() {
         // Stub: IOKit display sleep (Windows Caps+Z) will live here.
     }
