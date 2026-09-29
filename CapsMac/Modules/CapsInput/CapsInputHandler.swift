@@ -28,6 +28,7 @@ final class CapsInputHandler {
     private var capsPollSawPhysicalDown = false
     private var lastCapsTapReleaseTime: TimeInterval?
     private var awaitingDoubleTapLock = false
+    private var capsLockAlignmentID = 0
 
     private static let capsLockKeyCode = CGKeyCode(kVK_CapsLock)
     private static let rightCommandKeyCode = CGKeyCode(kVK_RightCommand)
@@ -478,6 +479,13 @@ final class CapsInputHandler {
     }
 
     private func alignHardwareCapsLock(enabled: Bool, remainingTries: Int) {
+        capsLockAlignmentID += 1
+        let alignmentID = capsLockAlignmentID
+        runCapsLockAlignment(alignmentID: alignmentID, enabled: enabled, remainingTries: remainingTries)
+    }
+
+    private func runCapsLockAlignment(alignmentID: Int, enabled: Bool, remainingTries: Int) {
+        guard alignmentID == capsLockAlignmentID else { return }
         syncCapsLockEngaged()
         guard state.isCapsLockEngaged != enabled else {
             publish()
@@ -489,7 +497,11 @@ final class CapsInputHandler {
         }
         CapsLockHardware.setModifierLockEngaged(enabled)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) { [weak self] in
-            self?.alignHardwareCapsLock(enabled: enabled, remainingTries: remainingTries - 1)
+            self?.runCapsLockAlignment(
+                alignmentID: alignmentID,
+                enabled: enabled,
+                remainingTries: remainingTries - 1
+            )
         }
     }
 
