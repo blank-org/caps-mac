@@ -2,7 +2,7 @@
 
 Native Swift/SwiftUI port of [Caps](../README.md) — a menu-bar keyboard utility that turns **Caps Lock** into a hold-modifier for home-row navigation, editing, media, and more.
 
-> **Status:** menu-bar utility with Accessibility status, single-instance launch, tap Caps Lock for normal caps / hold for the layer (Right Command is hold-only), home-row remaps, media keys, Caps+Q sleep, and Caps+= (or the menu bar item) for the keyboard map. Mouse and remaining app shortcuts are not implemented yet.
+> **Status:** menu-bar utility with Accessibility status, single-instance launch, tap Caps Lock for normal caps / hold for the layer (Right Command is hold-only), home-row remaps, media keys, Caps+Q sleep, Caps+B paste-type (robo paste), and Caps+= (or the menu bar item) for the keyboard map. Mouse and remaining app shortcuts are not implemented yet.
 
 ## Requirements
 
@@ -43,13 +43,19 @@ macos/
 | Module | Responsibility |
 |--------|----------------|
 | **CapsInput** | CGEvent tap: tap Caps Lock toggles caps; hold Caps Lock / Right Command activates the layer |
-| **CapsKeyMap** | Arrows, selection, word/browser jumps, Backspace → Delete, media keys, Caps+= map |
+| **CapsKeyMap** | Arrows, selection, word/browser jumps, Backspace → Delete, media keys, Caps+B paste-type, Caps+= map |
 | **CapsConfig** | User settings (`~/Library/Application Support/Caps/config.json`) |
 | **CapsSystem** | Accessibility, volume/media keys, Caps+Q sleep, keyboard map window; app launchers still stubbed |
 
 ## Accessibility permission
 
 Global key remapping requires **Accessibility** access. Open **Settings** from the menu bar and use **Grant Accessibility Access**. After you enable Caps in System Settings → Privacy & Security → Accessibility, the Settings window updates to **Granted** and starts the keyboard hook automatically (no restart in typical cases). If the hook still says **Not running**, quit and reopen Caps.
+
+macOS ties Accessibility grants to the app’s **code signature** (CDHash). Debug builds signed **ad hoc** (no `DEVELOPMENT_TEAM`) get a new hash on every rebuild, so System Settings drops the grant. This project sets `DEVELOPMENT_TEAM` to a stable Apple Development team in `CapsMac.xcodeproj` so local Debug builds keep the same signing identity across rebuilds. After switching from ad-hoc to team signing, you may need **one** fresh Accessibility enable for the new binary; later rebuilds should retain it. Clone on another machine: set `DEVELOPMENT_TEAM` in Xcode to your team or adjust the project setting.
+
+## Paste-type (Caps+B)
+
+Hold the Caps layer and press **B** to run **paste-type** (Windows “robo paste”): after a short wait (up to ~2.5 seconds, or press **Space** to start immediately), Caps types the current clipboard as **raw keystrokes**—not ⌘V—so it works in fields that block paste. Space during the wait only ends the wait; it is not typed. An empty clipboard does nothing.
 
 ## Command-line build (optional)
 
