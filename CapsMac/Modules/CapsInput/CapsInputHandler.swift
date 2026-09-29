@@ -4,6 +4,8 @@ import Foundation
 
 /// Captures Caps Lock / Right Command as the Caps layer modifier via a CGEvent tap,
 /// and remaps navigation, selection, and delete keys while the layer is active.
+/// Caps Lock is swallowed so macOS does not toggle on a single press; double-tap engages
+/// hardware Caps Lock, and a later quick tap turns it off again.
 final class CapsInputHandler {
     private struct HeldStroke: Hashable {
         let keyCode: CGKeyCode
@@ -24,10 +26,13 @@ final class CapsInputHandler {
     private var pendingCapsTap = false
     private var rightCommandIsHeld = false
     private var capsPollSawPhysicalDown = false
+    private var lastCapsTapReleaseTime: TimeInterval?
+    private var awaitingDoubleTapLock = false
 
     private static let capsLockKeyCode = CGKeyCode(kVK_CapsLock)
     private static let rightCommandKeyCode = CGKeyCode(kVK_RightCommand)
     private static let holdThreshold: TimeInterval = 0.18
+    private static let doubleTapThreshold: TimeInterval = 0.4
     private static let injectedUserData: Int64 = 0x4341_5053 // 'CAPS'
     private static let rightCommandDeviceFlag = CGEventFlags(rawValue: 0x0000_0010)
 
@@ -70,6 +75,8 @@ final class CapsInputHandler {
         capsIsHeld = false
         pendingCapsTap = false
         rightCommandIsHeld = false
+        lastCapsTapReleaseTime = nil
+        awaitingDoubleTapLock = false
         state.isLayerHeld = false
         if publishAfter {
             publish()
@@ -316,6 +323,10 @@ final class CapsInputHandler {
 
     private func capsDown() {
         if capsIsHeld { return }
+        expireStaleDoubleTapCandidate()
+        if isWithinDoubleTapWindow() {
+            awaitingDoubleTapLock = true
+        }
         capsIsHeld = true
         pendingCapsTap = true
         capsPollSawPhysicalDown = false
@@ -339,15 +350,51 @@ final class CapsInputHandler {
         }
 
         if shouldToggleCaps {
-            toggleHardwareCapsLock()
+            handleCapsTapRelease()
         }
         syncCapsLockEngaged()
         publish()
     }
 
+    /// Quick tap/release (not a hold): double-tap engages Caps Lock; a single tap stays off.
+    private func handleCapsTapRelease() {
+        let now = Date().timeIntervalSinceReferenceDate
+
+        if awaitingDoubleTapLock {
+            awaitingDoubleTapLock = false
+            lastCapsTapReleaseTime = nil
+            alignHardwareCapsLock(enabled: true, remainingTries: 6)
+            return
+        }
+
+        let capsOn = CGEventSource.flagsState(.hidSystemState).contains(.maskAlphaShift)
+        if capsOn || state.isCapsLockEngaged {
+            lastCapsTapReleaseTime = nil
+            alignHardwareCapsLock(enabled: false, remainingTries: 6)
+            return
+        }
+
+        lastCapsTapReleaseTime = now
+        alignHardwareCapsLock(enabled: false, remainingTries: 6)
+    }
+
+    private func isWithinDoubleTapWindow() -> Bool {
+        guard let last = lastCapsTapReleaseTime else { return false }
+        return Date().timeIntervalSinceReferenceDate - last <= Self.doubleTapThreshold
+    }
+
+    private func expireStaleDoubleTapCandidate() {
+        guard let last = lastCapsTapReleaseTime else { return }
+        if Date().timeIntervalSinceReferenceDate - last > Self.doubleTapThreshold {
+            lastCapsTapReleaseTime = nil
+        }
+    }
+
     private func activateLayerFromHold() {
         guard capsIsHeld else { return }
         pendingCapsTap = false
+        awaitingDoubleTapLock = false
+        lastCapsTapReleaseTime = nil
         stopHoldTimer()
         guard !state.isLayerHeld else { return }
         state.isLayerHeld = true
@@ -412,14 +459,6 @@ final class CapsInputHandler {
             capsPollSawPhysicalDown = true
         } else if capsPollSawPhysicalDown {
             capsUp()
-        }
-    }
-
-    private func toggleHardwareCapsLock() {
-        let currentlyOn = CGEventSource.flagsState(.hidSystemState).contains(.maskAlphaShift)
-        postInjectedCapsLockPulse()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
-            self?.alignHardwareCapsLock(enabled: !currentlyOn, remainingTries: 6)
         }
     }
 

@@ -37,7 +37,7 @@ struct SettingsView: View {
             }
 
             Section("Development") {
-                Text("Tap Caps Lock for normal caps. Hold Caps Lock (or Right Command) for the layer. WASD / IJKL arrows; E/F/G/H selection; O [ ; P ] \\ media; Q sleeps; = opens the map. Mouse and remaining app shortcuts are next.")
+                Text("Double-tap Caps Lock for normal caps lock; a single tap does not leave Caps on. Hold Caps Lock (or Right Command) for the layer. WASD / IJKL arrows; E/F/G/H selection; O [ ; P ] \\ media; Q sleeps; = opens the map. Mouse and remaining app shortcuts are next.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
