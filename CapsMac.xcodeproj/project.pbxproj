@@ -25,6 +25,7 @@
 		5F3A1B2C3D4E5F607182940C /* ConfigStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293CC /* ConfigStore.swift */; };
 		5F3A1B2C3D4E5F607182940D /* AccessibilityPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293CD /* AccessibilityPermission.swift */; };
 		5F3A1B2C3D4E5F607182940E /* SystemIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293CE /* SystemIntegration.swift */; };
+		5F3A1B2C3D4E5F6071829416 /* CapsLockHardware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293D6 /* CapsLockHardware.swift */; };
 		5F3A1B2C3D4E5F6071829411 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F3A1B2C3D4E5F60718293D1 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -48,6 +49,7 @@
 		5F3A1B2C3D4E5F60718293CC /* ConfigStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigStore.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293CD /* AccessibilityPermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityPermission.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293CE /* SystemIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemIntegration.swift; sourceTree = "<group>"; };
+		5F3A1B2C3D4E5F60718293D6 /* CapsLockHardware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsLockHardware.swift; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293D1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5F3A1B2C3D4E5F60718293D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -164,6 +166,7 @@
 			isa = PBXGroup;
 			children = (
 				5F3A1B2C3D4E5F60718293CD /* AccessibilityPermission.swift */,
+				5F3A1B2C3D4E5F60718293D6 /* CapsLockHardware.swift */,
 				5F3A1B2C3D4E5F60718293CE /* SystemIntegration.swift */,
 			);
 			path = CapsSystem;
@@ -264,6 +267,7 @@
 				5F3A1B2C3D4E5F607182940B /* CapsConfiguration.swift in Sources */,
 				5F3A1B2C3D4E5F607182940C /* ConfigStore.swift in Sources */,
 				5F3A1B2C3D4E5F607182940D /* AccessibilityPermission.swift in Sources */,
+				5F3A1B2C3D4E5F6071829416 /* CapsLockHardware.swift in Sources */,
 				5F3A1B2C3D4E5F607182940E /* SystemIntegration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

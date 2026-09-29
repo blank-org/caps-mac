@@ -4,8 +4,8 @@ import Foundation
 
 /// Captures Caps Lock / Right Command as the Caps layer modifier via a CGEvent tap,
 /// and remaps navigation, selection, and delete keys while the layer is active.
-/// Caps Lock is swallowed so macOS does not toggle on a single press; double-tap engages
-/// hardware Caps Lock, and a later quick tap turns it off again.
+/// Caps key events are swallowed in the tap; the HID driver may still latch Caps Lock, so
+/// `CapsLockHardware` forces the modifier off unless the user double-taps (or taps off).
 final class CapsInputHandler {
     private struct HeldStroke: Hashable {
         let keyCode: CGKeyCode
@@ -172,6 +172,9 @@ final class CapsInputHandler {
     }
 
     private func handleCapsLock(type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
+        if !awaitingDoubleTapLock {
+            suppressDriverCapsLockLatch()
+        }
         switch type {
         case .keyDown:
             if !capsIsHeld {
@@ -330,6 +333,9 @@ final class CapsInputHandler {
         capsIsHeld = true
         pendingCapsTap = true
         capsPollSawPhysicalDown = false
+        if !awaitingDoubleTapLock {
+            suppressDriverCapsLockLatch()
+        }
         startHoldTimer()
         startReleasePoller()
         publish()
@@ -367,7 +373,7 @@ final class CapsInputHandler {
             return
         }
 
-        let capsOn = CGEventSource.flagsState(.hidSystemState).contains(.maskAlphaShift)
+        let capsOn = CapsLockHardware.isModifierLockEngaged()
         if capsOn || state.isCapsLockEngaged {
             lastCapsTapReleaseTime = nil
             alignHardwareCapsLock(enabled: false, remainingTries: 6)
@@ -463,13 +469,17 @@ final class CapsInputHandler {
     }
 
     private func syncCapsLockEngaged() {
-        state.isCapsLockEngaged = CGEventSource.flagsState(.hidSystemState).contains(.maskAlphaShift)
+        state.isCapsLockEngaged = CapsLockHardware.isModifierLockEngaged()
+    }
+
+    /// Undoes driver-level Caps Lock latches that event taps cannot prevent.
+    private func suppressDriverCapsLockLatch() {
+        alignHardwareCapsLock(enabled: false, remainingTries: 2)
     }
 
     private func alignHardwareCapsLock(enabled: Bool, remainingTries: Int) {
-        let currentlyOn = CGEventSource.flagsState(.hidSystemState).contains(.maskAlphaShift)
-        state.isCapsLockEngaged = currentlyOn
-        guard currentlyOn != enabled else {
+        syncCapsLockEngaged()
+        guard state.isCapsLockEngaged != enabled else {
             publish()
             return
         }
@@ -477,23 +487,10 @@ final class CapsInputHandler {
             publish()
             return
         }
-        postInjectedCapsLockPulse()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) { [weak self] in
+        CapsLockHardware.setModifierLockEngaged(enabled)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) { [weak self] in
             self?.alignHardwareCapsLock(enabled: enabled, remainingTries: remainingTries - 1)
         }
-    }
-
-    private func postInjectedCapsLockPulse() {
-        let source = CGEventSource(stateID: .hidSystemState)
-        source?.userData = Self.injectedUserData
-        guard
-            let down = CGEvent(keyboardEventSource: source, virtualKey: Self.capsLockKeyCode, keyDown: true),
-            let up = CGEvent(keyboardEventSource: source, virtualKey: Self.capsLockKeyCode, keyDown: false)
-        else { return }
-        down.setIntegerValueField(.eventSourceUserData, value: Self.injectedUserData)
-        up.setIntegerValueField(.eventSourceUserData, value: Self.injectedUserData)
-        down.post(tap: .cgSessionEventTap)
-        up.post(tap: .cgSessionEventTap)
     }
 
     private func publish() {
