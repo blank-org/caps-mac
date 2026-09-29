@@ -275,6 +275,11 @@ final class CapsInputHandler {
                 SystemIntegration.showKeyboardMap()
             }
             return nil
+        case .pasteType:
+            if type == .keyDown && !isRepeat {
+                SystemIntegration.pasteType()
+            }
+            return nil
         default:
             return Unmanaged.passUnretained(event)
         }

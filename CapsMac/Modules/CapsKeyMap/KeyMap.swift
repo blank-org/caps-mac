@@ -53,6 +53,7 @@ struct KeyMap {
         CGKeyCode(kVK_ANSI_Backslash): .nextTrack,
         CGKeyCode(kVK_ANSI_Q): .sleepDisplay,
         CGKeyCode(kVK_ANSI_Equal): .showKeyboardMap,
+        CGKeyCode(kVK_ANSI_B): .pasteType,
     ]
 
     /// Label map for config/UI; expand toward Windows parity.
