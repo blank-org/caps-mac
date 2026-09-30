@@ -16,7 +16,6 @@ final class CapsInputHandler {
 
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
-    private var releasePollTimer: Timer?
     private var holdTimer: Timer?
     private let keyMap = KeyMap()
     private var heldRemaps: [HeldStroke: Int] = [:]
@@ -25,7 +24,6 @@ final class CapsInputHandler {
     private var capsIsHeld = false
     private var pendingCapsTap = false
     private var rightCommandIsHeld = false
-    private var capsPollSawPhysicalDown = false
     private var lastCapsTapReleaseTime: TimeInterval?
     private var awaitingDoubleTapLock = false
     private var capsLockAlignmentID = 0
@@ -72,7 +70,6 @@ final class CapsInputHandler {
     func resetTransientState(publishAfter: Bool = true) {
         releaseHeldRemaps()
         stopHoldTimer()
-        stopReleasePoller()
         capsIsHeld = false
         pendingCapsTap = false
         rightCommandIsHeld = false
@@ -173,7 +170,10 @@ final class CapsInputHandler {
     }
 
     private func handleCapsLock(type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
-        if !awaitingDoubleTapLock {
+        let physicalDown = isPhysicalCapsLockDown()
+        // IOHID latch corrections emit flagsChanged without a physical key press; treating those
+        // as a hold would leave a 30ms key-state poll running and prevent display sleep.
+        if !awaitingDoubleTapLock, type != .flagsChanged || physicalDown {
             suppressDriverCapsLockLatch()
         }
         switch type {
@@ -187,16 +187,20 @@ final class CapsInputHandler {
             return nil
         case .flagsChanged:
             if capsIsHeld {
-                if !CGEventSource.keyState(.hidSystemState, key: Self.capsLockKeyCode) {
+                if !physicalDown {
                     capsUp()
                 }
-            } else {
+            } else if physicalDown {
                 capsDown()
             }
             return nil
         default:
             return Unmanaged.passUnretained(event)
         }
+    }
+
+    private func isPhysicalCapsLockDown() -> Bool {
+        CGEventSource.keyState(.hidSystemState, key: Self.capsLockKeyCode)
     }
 
     private func handleRightCommand(type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
@@ -333,12 +337,10 @@ final class CapsInputHandler {
         }
         capsIsHeld = true
         pendingCapsTap = true
-        capsPollSawPhysicalDown = false
         if !awaitingDoubleTapLock {
             suppressDriverCapsLockLatch()
         }
         startHoldTimer()
-        startReleasePoller()
         publish()
     }
 
@@ -346,7 +348,6 @@ final class CapsInputHandler {
         guard capsIsHeld else { return }
         capsIsHeld = false
         stopHoldTimer()
-        stopReleasePoller()
 
         let shouldToggleCaps = pendingCapsTap
         pendingCapsTap = false
@@ -438,34 +439,6 @@ final class CapsInputHandler {
                 releaseHeldRemaps()
             }
             publish()
-        }
-    }
-
-    private func startReleasePoller() {
-        stopReleasePoller()
-        let timer = Timer(timeInterval: 0.03, repeats: true) { [weak self] _ in
-            self?.pollCapsLockRelease()
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        releasePollTimer = timer
-    }
-
-    private func stopReleasePoller() {
-        releasePollTimer?.invalidate()
-        releasePollTimer = nil
-        capsPollSawPhysicalDown = false
-    }
-
-    private func pollCapsLockRelease() {
-        guard capsIsHeld else {
-            stopReleasePoller()
-            return
-        }
-        let physical = CGEventSource.keyState(.hidSystemState, key: Self.capsLockKeyCode)
-        if physical {
-            capsPollSawPhysicalDown = true
-        } else if capsPollSawPhysicalDown {
-            capsUp()
         }
     }
 
